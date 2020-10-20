@@ -1,0 +1,6 @@
+app:
+  "rapidApiUrl": "https://rapidapi.p.rapidapi.com"
+  "rapidApiHost": "covid-19-data.p.rapidapi.com"
+  "rapidApiHostHeader": "x-rapidapi-host"
+  "rapidApiKeyHeader": "x-rapidapi-key"
+  "rapidApiKey": "3704fdb777msh2b958a05da5591dp19bc74jsn0b77c46970bc"
