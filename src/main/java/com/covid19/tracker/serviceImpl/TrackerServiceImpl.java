@@ -1,9 +1,11 @@
 package com.covid19.tracker.serviceImpl;
 
+import com.covid19.tracker.entity.Comment;
 import com.covid19.tracker.entity.Country;
 import com.covid19.tracker.entity.Report;
 import com.covid19.tracker.exception.ItemNotFoundException;
 import com.covid19.tracker.model.OverallReport;
+import com.covid19.tracker.model.UpdateRequest;
 import com.covid19.tracker.repository.CountryRepository;
 import com.covid19.tracker.repository.ReportRepository;
 import com.covid19.tracker.service.TrackerService;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -62,5 +65,23 @@ public class TrackerServiceImpl implements TrackerService {
 
     public OverallReport fetchGlobalStats() {
         return dataQueryService.fetchOverAllStats().stream().findFirst().orElseThrow(() -> new ItemNotFoundException("No data found"));
+    }
+
+    public void updateFavourite(String countryName, Boolean updateTo) {
+        reportRepository.findById(countryName).ifPresent(it -> {
+            it.setFavourite(updateTo);
+            reportRepository.save(it);
+        });
+    }
+
+    public Report addComment(UpdateRequest request) {
+        Report data = reportRepository.findById(request.getCountryName()).orElseThrow(() -> new ItemNotFoundException("request failed to process, no such country found"));
+        List<Comment> comments = Optional.ofNullable(data.getComments()).orElseGet(ArrayList::new);
+        Comment comment = new Comment();
+        comment.setComment(request.getComment());
+        comment.setReport(data);
+        comments.add(comment);
+        data.setComments(comments);
+        return reportRepository.save(data);
     }
 }
