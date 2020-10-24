@@ -41,7 +41,7 @@ public class Controller {
         return service.fetchGlobalStats();
     }
 
-    @PatchMapping("/updateFavourite")
+    @PutMapping("/updateFavourite")
     public void updateFavourite(@RequestParam String countryName, @RequestParam Boolean updateTo) {
         service.updateFavourite(countryName, updateTo);
     }

@@ -1,6 +1,5 @@
 package com.covid19.tracker.serviceImpl;
 
-import com.covid19.tracker.entity.Comment;
 import com.covid19.tracker.entity.Country;
 import com.covid19.tracker.entity.Report;
 import com.covid19.tracker.exception.ItemNotFoundException;
@@ -40,7 +39,7 @@ public class TrackerServiceImpl implements TrackerService {
     }
 
     public Report getReportByCountryName(String name) {
-        return reportRepository.findById(name).orElseGet(() -> {
+        return reportRepository.findByCountryIgnoreCase(name).orElseGet(() -> {
             AtomicReference<Report> report = new AtomicReference<>(null);
             dataQueryService.fetchDataByCountryName(name).stream().findFirst().ifPresent(
                     it -> {
@@ -52,7 +51,7 @@ public class TrackerServiceImpl implements TrackerService {
     }
 
     public Report getReportByCountryCode(String code) {
-        return reportRepository.findByCode(code).orElseGet(() -> {
+        return reportRepository.findByCodeIgnoreCase(code).orElseGet(() -> {
             AtomicReference<Report> report = new AtomicReference<>(null);
             dataQueryService.fetchDataByCountryCode(code).stream().findFirst().ifPresent(
                     it -> {
@@ -68,19 +67,16 @@ public class TrackerServiceImpl implements TrackerService {
     }
 
     public void updateFavourite(String countryName, Boolean updateTo) {
-        reportRepository.findById(countryName).ifPresent(it -> {
+        reportRepository.findByCountryIgnoreCase(countryName).ifPresent(it -> {
             it.setFavourite(updateTo);
             reportRepository.save(it);
         });
     }
 
     public Report addComment(UpdateRequest request) {
-        Report data = reportRepository.findById(request.getCountryName()).orElseThrow(() -> new ItemNotFoundException("request failed to process, no such country found"));
-        List<Comment> comments = Optional.ofNullable(data.getComments()).orElseGet(ArrayList::new);
-        Comment comment = new Comment();
-        comment.setComment(request.getComment());
-        comment.setReport(data);
-        comments.add(comment);
+        Report data = reportRepository.findByCountryIgnoreCase(request.getCountryName()).orElseThrow(() -> new ItemNotFoundException("request failed to process, no such country found"));
+        List<String> comments = Optional.ofNullable(data.getComments()).orElseGet(ArrayList::new);
+        comments.add(request.getComment());
         data.setComments(comments);
         return reportRepository.save(data);
     }

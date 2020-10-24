@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,12 +27,9 @@ public class Report {
     private Integer deaths;
     private Double latitude;
     private Double longitude;
-    //    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'+'ZZ:ZZ", shape = JsonFormat.Shape.STRING)
     private String lastChange;
     private String lastUpdate;
-
     private Boolean favourite = false;
-
-    @OneToMany(mappedBy = "report", cascade = {CascadeType.ALL})
-    private List<Comment> comments;
+    @ElementCollection
+    private List<String> comments = new ArrayList<>();
 }
